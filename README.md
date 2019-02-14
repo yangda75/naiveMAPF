@@ -1,0 +1,5 @@
+# naiveMAPF
+naive implementations of Multi-Agent Path Finding algorithms
+算法列表：
+1. AStar.hpp: 支持约束(constraint)的A*搜索
+2. CBS.hpp: 基于冲突的搜索(Conflict-Based Searching)
