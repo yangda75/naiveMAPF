@@ -30,19 +30,19 @@ CBS readJSONMapFile(std::string JSONMapFilePath) {
 
 void writeSchedule2JSONFile(std::string JSONScheduleFilePath,
                             CTNode* solutionNode) {
-    json j = json::object();
-    int agent = 0;
-    for (auto path : solutionNode->solution) {
-      std::string agentStr = std::to_string(agent);
-      j[agentStr] = json::array();
-        for (GridPoint point : path) {
-            std::cout << point.x << "," << point.y << "->";
-            j[agentStr].push_back(json::array({point.x, point.y}));
+    json j_all = json::object();
+    json j_all_solutions = json::array();
+    for (int i = 0; i < solutionNode->solution.size(); i++) {
+        json j = json::object();
+	j["agent"] = i;
+	j["path"] = json::array();
+        for (GridPoint point : solutionNode->solution[i]) {
+            j["path"].push_back(json::array({point.x, point.y}));
         }
-        std::cout << "finish" << std::endl;
-        agent++;
+	j_all_solutions.push_back(j);
     }
+    j_all["solutions"] = j_all_solutions;
     std::ofstream o(JSONScheduleFilePath);
 
-    o << j;
+    o <<j_all.dump(-1);
 }
