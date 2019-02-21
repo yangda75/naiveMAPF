@@ -120,7 +120,7 @@ void CBS::splitOnConflict(Conflict con, CTNode *node) {
             new1.push_back(c);
         else if (c.agent == agent2)
             new2.push_back(c);
-    std::cout << "constraints for agent " << agent1 << "\n";
+    //std::cout << "constraints for agent " << agent1 << "\n";
     for (Constraint cc : new1) {
         std::cout << "agent " << agent1 << " point: " << cc.point.x << ","
                   << cc.point.y << "time: " << cc.constraintTimeStamp << "\n";
@@ -132,13 +132,13 @@ void CBS::splitOnConflict(Conflict con, CTNode *node) {
     }
     // check if already in the list, if already in, then no need to proceed
     // TODO: remove redundant code
-    std::cout << "original solution\n";
-    for (auto path : node->solution) {
-        for (GridPoint point : path) {
-            std::cout << point.x << "," << point.y << "->";
-        }
-        std::cout << "finish" << std::endl;
-    }
+    // std::cout << "original solution\n";
+    // for (auto path : node->solution) {
+    //     for (GridPoint point : path) {
+    //         std::cout << point.x << "," << point.y << "->";
+    //     }
+    //     std::cout << "finish" << std::endl;
+    // } 
 
     if (std::find(new1.begin(), new1.end(), c1) == new1.end()) {
         std::cout << "adding constraint "
@@ -148,10 +148,10 @@ void CBS::splitOnConflict(Conflict con, CTNode *node) {
         CTNode *newNode1 =
             new CTNode(node->cost, new1, node->solution, node->costs);
         AStar lowLevelSearchObj1(dimX, dimY, obstacles, new1);
-        std::cout << "searching for agent " << agent1
-                  << ", start: " << starts[agent1].x << "," << starts[agent1].y
-                  << ", goal: " << goals[agent1].x << "," << goals[agent1].y
-                  << "\n";
+        // std::cout << "searching for agent " << agent1
+        //           << ", start: " << starts[agent1].x << "," << starts[agent1].y
+        //           << ", goal: " << goals[agent1].x << "," << goals[agent1].y
+        //           << "\n";
         newNode1->solution[agent1] =
             lowLevelSearchObj1.search(starts[agent1], goals[agent1]);
         Cost cost1 = lowLevelSearchObj1.getFinalCost();
@@ -160,13 +160,13 @@ void CBS::splitOnConflict(Conflict con, CTNode *node) {
         newNode1->costs[agent1] = cost1;
         // add children to node
         node->leftChild = newNode1;
-        std::cout << "after updating :\n";
-        for (auto path : newNode1->solution) {
-            for (GridPoint point : path) {
-                std::cout << point.x << "," << point.y << "->";
-            }
-            std::cout << "finish" << std::endl;
-        }
+        // std::cout << "after updating :\n";
+        // for (auto path : newNode1->solution) {
+        //     for (GridPoint point : path) {
+        //         std::cout << point.x << "," << point.y << "->";
+        //     }
+        //     std::cout << "finish" << std::endl;
+        // } 
     }
     if (std::find(new2.begin(), new2.end(), c2) == new2.end()) {
         std::cout << "adding constraint "
