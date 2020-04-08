@@ -1,4 +1,4 @@
-#include "AStar.hpp"
+#include "../src/AStar.hpp"
 #include <cstdlib>  // rand
 #include <iomanip>  // setw
 // int test1() {

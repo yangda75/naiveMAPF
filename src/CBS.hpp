@@ -54,6 +54,7 @@ class CBS {
           starts(s),
           goals(g),
           root(nullptr),
+          solutionNode (nullptr),
           cnt(0) {}
     void splitOnConflict(Conflict con, CTNode *node);
     void search();
@@ -231,7 +232,7 @@ void CBS::search() {
                   << "\npoint: " << conflict.point.x << "," << conflict.point.y
                   << "\n"
                   << conflict.timeStamp << "\n";
-        if (conflict.agent1 == -1 or conflict.agent2 == -1) {
+        if (conflict.agent1 == -1 || conflict.agent2 == -1) {
             // no conflict is found
             solutionNode = currentCTNode;
             return;

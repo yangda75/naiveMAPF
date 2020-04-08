@@ -1,5 +1,5 @@
-#include "CBS.hpp"
-#include "jsonMapUtil.hpp"
+#include "../src/CBS.hpp"
+#include "../src/jsonMapUtil.hpp"
 void test() {
     CBS cbsObj = readJSONMapFile("testConvert.json");
     cbsObj.search();

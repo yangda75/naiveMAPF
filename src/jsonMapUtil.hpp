@@ -1,6 +1,6 @@
 #include <fstream>
 #include "CBS.hpp"
-#include "json.hpp"
+#include "../lib/json.hpp"
 using json = nlohmann::json;
 CBS readJSONMapFile(std::string JSONMapFilePath) {
     int dimX, dimY;

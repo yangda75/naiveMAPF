@@ -1,2 +1,6 @@
 .ccls-cache/
 a.out
+out/
+.vs/
+.idea/
+cmake-build-debug/
