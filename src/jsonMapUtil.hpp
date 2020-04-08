@@ -1,13 +1,31 @@
 #include <fstream>
 #include "CBS.hpp"
 #include "../lib/json.hpp"
+#include <direct.h>
+#define GetCurrentDir _getcwd
+#include <iostream>
+
+std::string get_current_dir() {
+    char buff[FILENAME_MAX];  // create string buffer to hold path
+    GetCurrentDir(buff, FILENAME_MAX);
+    std::string current_working_dir(buff);
+    return current_working_dir;
+}
+
+void print_current_dir() { std::cout << get_current_dir() << std::endl; }
+
 using json = nlohmann::json;
+
+
 CBS readJSONMapFile(std::string JSONMapFilePath) {
-    int dimX, dimY;
-    std::vector<GridPoint> obstacles;
-    std::vector<GridPoint> starts, goals;
-    int numberOfAgents;
-    std::ifstream i(JSONMapFilePath);
+    print_current_dir();
+    int dimX{}, dimY{};
+    std::vector<GridPoint> obstacles{};
+    std::vector<GridPoint> starts{}, goals{};
+    int numberOfAgents{};
+    std::ifstream i;
+    i.open(JSONMapFilePath);
+    if (!i) std::cout << "Error opening " << JSONMapFilePath << '\n';
     json j;
     i >> j;
     numberOfAgents = j["numberofagents"];

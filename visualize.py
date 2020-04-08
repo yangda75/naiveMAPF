@@ -104,9 +104,9 @@ class Animation:
 
 
 if __name__ == "__main__":
-    with open("sampleSchedule.json") as solution_json_file:
+    with open("test/sampleSchedule.json") as solution_json_file:
         solution_json = json.load(solution_json_file)
-    with open("testConvert.json") as map_json_file:
+    with open("test/sampleMap.json") as map_json_file:
         map_json = json.load(map_json_file)
 
     animation = Animation(map_json, solution_json)
