@@ -8,7 +8,7 @@
 // definition
 //////////////////////////////////////////////////////////////////////
 
-typedef int Cost;
+using Cost = int;
 
 struct GridPoint {
     int x{0};
@@ -17,6 +17,10 @@ struct GridPoint {
     GridPoint(int xx, int yy) : x{xx}, y{yy} {}
     bool operator==(const GridPoint &p) const { return p.x == x && p.y == y; }
 };
+
+inline std::ostream &operator<<(std::ostream &s, const GridPoint &point) {
+    return s << "(" << point.x << "," << point.y << ")";
+}
 
 struct Node {
     GridPoint point;
@@ -35,10 +39,10 @@ struct greater {
 };
 
 struct Constraint {
-    int agent;
+    int agent{};
     GridPoint point;
-    int constraintTimeStamp;
-    Constraint() {}
+    int constraintTimeStamp{};
+    Constraint() = default;
     Constraint(int a, GridPoint p, int t)
         : agent(a), point(p), constraintTimeStamp(t) {}
     Constraint(GridPoint p, int t) : point(p), constraintTimeStamp(t) {}
@@ -68,35 +72,34 @@ class AStar {
           timeStamp(0),
           finalCost(0) {}
     std::vector<GridPoint> search(GridPoint &start, GridPoint &goal);
-    Cost getCost(GridPoint p1, GridPoint p2);
+    static Cost getCost(GridPoint p1, GridPoint p2);
     std::vector<GridPoint> getAdjacentGridPoints(GridPoint &p);
-    Cost heuristic(GridPoint s, GridPoint g);
+    static Cost heuristic(GridPoint s, GridPoint g);
     Node getParent(GridPoint p);
-    Cost getFinalCost();
+    Cost getFinalCost() const;
 };
 
 ///////////////////////////////////////////////////////////////////
 // implementation
 ///////////////////////////////////////////////////////////////////
-std::vector<GridPoint> AStar::search(GridPoint &start, GridPoint &goal) {
+inline std::vector<GridPoint> AStar::search(GridPoint &start, GridPoint &goal) {
     std::cout << "searching with constraints: \n";
     for (Constraint c : constraints) {
-        std::cout << "agent: " << c.agent << " point: " << c.point.x << ","
-                  << c.point.y << " time: " << c.constraintTimeStamp << "\n";
+        std::cout << "agent: " << c.agent << " point: " << c.point<< " time: " << c.constraintTimeStamp << "\n";
     }
     std::vector<GridPoint> path;
     Cost h = heuristic(start, goal);
-    Node startNode = Node(start, 0, h, start,0);
+    Node startNode = Node(start, 0, h, start, 0);
     openSet.push_back(startNode);
     // begin search
     // int cnt = 0;
-    while (! openSet.empty()) {
+    while (!openSet.empty()) {
         std::sort(openSet.begin(), openSet.end(), greater());
         Node currentNode = openSet.back();
         openSet.pop_back();  // delete the smallest element
         // push into closedSet
         closedSet.push_back(currentNode);
-	timeStamp = currentNode.timeStamp;
+        timeStamp = currentNode.timeStamp;
         if (currentNode.point.x == goal.x && currentNode.point.y == goal.y) {
             // goal point found
             finalCost = currentNode.f;
@@ -143,7 +146,7 @@ std::vector<GridPoint> AStar::search(GridPoint &start, GridPoint &goal) {
                     if (child.f < n.f) {
                         n.g = child.g;
                         n.f = child.f;
-			n.timeStamp = child.timeStamp;
+                        n.timeStamp = child.timeStamp;
                         // std::cout << "changing " << n.point.x << "," <<
                         // n.point.y
                         //           << " 's parent from " << n.parent.x << ","
@@ -162,57 +165,54 @@ std::vector<GridPoint> AStar::search(GridPoint &start, GridPoint &goal) {
     return path;
 }
 
-std::vector<GridPoint> AStar::getAdjacentGridPoints(GridPoint &p) {
+inline std::vector<GridPoint> AStar::getAdjacentGridPoints(GridPoint &p) {
     std::vector<GridPoint> adjGridPoints;
-    int xx[] = {-1, 0, 1};
-    int yy[] = {-1, 0, 1};
-    for (int dx : xx)
-        for (int dy : yy)
-            // TODO: implement WAIT operation where dx = dy =0
-            // maybe adding 'timeStamp' field to Node works
-            if (std::abs(dx + dy) == 1) {
-                int x = dx + p.x;
-                int y = dy + p.y;
-                if (x >= 0 && x < dimX && y >= 0 && y < dimY) {
-                    GridPoint newPoint(x, y);
-                    if (std::find(obstacles.begin(), obstacles.end(),
-                                  newPoint) == obstacles.end()) {
-                        bool flag = true;
-                        for (Constraint c : constraints)
-                            if (c.point == newPoint &&
-                                c.constraintTimeStamp == timeStamp + 1)
-                            // not allowed to go to newPoint
-                            {
-                                std::cout << "constrained, not adding point "
-                                          << newPoint.x << "," << newPoint.y
-                                          << "\n";
-                                flag = false;
-                                break;
-                            }
-                        if (flag) adjGridPoints.push_back(newPoint);
+    std::vector<std::pair<int, int>> moves{
+        {0, 1}, {1, 0}, {0, -1}, {-1, 0}, {0, 0}};
+    for (const auto &m : moves) {
+        int dx = m.first, dy = m.second;
+        int x = dx + p.x;
+        int y = dy + p.y;
+        if (x >= 0 && x < dimX && y >= 0 && y < dimY) {
+            GridPoint newPoint(x, y);
+//            std::cout << "new point: " << newPoint << "\n";
+            if (std::find(obstacles.begin(), obstacles.end(), newPoint) ==
+                obstacles.end()) {
+                bool flag = true;
+                for (Constraint c : constraints)
+                    if (c.point == newPoint &&
+                        c.constraintTimeStamp == timeStamp + 1)
+                    // not allowed to go to newPoint
+                    {
+                        std::cout << "constrained, not adding point "
+                                  << newPoint << "\n";
+                        flag = false;
+                        break;
                     }
-                }
+                if (flag) adjGridPoints.push_back(newPoint);
             }
-    if (! constraints.empty()) {
-        std::cout << "at timestamp " << timeStamp << "current point: " << p.x
-                  << "," << p.y << ", adding points: \n";
+        }
+    }
+    if (!constraints.empty()) {
+        std::cout << "at timestamp " << timeStamp << " current point: " << p
+                  << ", adding points: \n";
         for (auto pp : adjGridPoints) {
-            std::cout << pp.x << "," << pp.y << " ";
+            std::cout << pp << " ";
         }
         std::cout << "\n";
     }
     return adjGridPoints;
 }
 
-Cost AStar::getCost(GridPoint p1, GridPoint p2) {
+inline Cost AStar::getCost(GridPoint p1, GridPoint p2) {
     return std::abs(p1.x - p2.x) + std::abs(p1.y - p2.y);
 }
 
-Cost AStar::heuristic(GridPoint s, GridPoint g) {
+inline Cost AStar::heuristic(GridPoint s, GridPoint g) {
     return std::abs(s.x - g.x) + std::abs(s.y - g.y);
 }
 
-Node AStar::getParent(GridPoint p) {
+inline Node AStar::getParent(GridPoint p) {
     Node newNode(GridPoint(-1, -1), -1, -1, GridPoint(-1, -1));
     for (Node n : closedSet) {
         if (n.point == p) {
@@ -233,4 +233,4 @@ Node AStar::getParent(GridPoint p) {
     return newNode;
 }
 
-Cost AStar::getFinalCost() { return finalCost; }
+inline Cost AStar::getFinalCost() const { return finalCost; }
