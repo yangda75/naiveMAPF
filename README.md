@@ -1,3 +1,5 @@
+
+
 # naiveMAPF
 <a href="https://scan.coverity.com/projects/yangda75-naivemapf">
   <img alt="Coverity Scan Build Status"
@@ -7,4 +9,4 @@
 naive implementations of Multi-Agent Path Finding algorithms
 算法列表：
 1. AStar.hpp: 支持约束(constraint)的A*搜索
-2. CBS.hpp: 基于冲突的搜索(Conflict-Based Searching)
+2. CBS.hpp: 基于顶点冲突的搜索(Conflict-Based Searching)
